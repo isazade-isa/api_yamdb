@@ -1,11 +1,18 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
-from .views import UserViewSet, ProfileViewSet
+from rest_framework_simplejwt import views as jwt_views
+
+from .views import UserViewSet, ConfirmationCode, Token
 
 router = SimpleRouter()
-
 router.register(r'users', UserViewSet)
-#router.register(r'users/me', ProfileViewSet)
+
 urlpatterns = [
+    path(r'auth/signup/', ConfirmationCode.as_view()),
+    path(
+        'auth/token/',
+        Token.as_view(),
+        name='token_obtain_pair'
+    ),
     path('', include(router.urls)),
 ]
