@@ -34,7 +34,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'category', 'genre')
+        fields = ('id', 'name', 'category', 'genre', 'year', 'description')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -79,7 +79,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
-        if data['username'] == 'me':
+        if data.get('username') == 'me':
             raise serializers.ValidationError(
                 "Don't create user with username 'me'")
         return data
