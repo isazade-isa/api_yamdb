@@ -44,8 +44,8 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
+# class ProfileViewSet(viewsets.ModelViewSet):
+#     serializer_class = UserSerializer
 
-    def get_queryset(self):
-        return CustomUser.objects.filter(user=self.request.user)
+#     def get_queryset(self):
+#         return CustomUser.objects.filter(user=self.request.user)

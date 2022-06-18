@@ -2,8 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from .views import (CategoryViewSet, GenreViewSet,
-                    TitleViewSet, UserViewSet,
-                    ProfileViewSet)
+                    TitleViewSet, UserViewSet)
 
 app_name = 'api'
 
@@ -13,7 +12,7 @@ router_v1.register('categories', CategoryViewSet)
 router_v1.register('genres', GenreViewSet)
 router_v1.register('titles', TitleViewSet)
 router_v1.register('users', UserViewSet)
-#router_v1.register('users/me', ProfileViewSet)
+# router_v1.register('users/me', ProfileViewSet)
 
 
 urlpatterns = [
