@@ -5,29 +5,72 @@ from users.models import CustomUser
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=30)
-    slug = models.SlugField(max_length=30, unique=True)
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название категории'
+    )
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Адрес категории'
+    )
+
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
     def __str__(self):
         return self.name
-
 
 class Title(models.Model):
-    name = models.TextField()
-    year = models.IntegerField()
-    category_id =models.ForeignKey(Category, on_delete=models.CASCADE, related_name='categories')
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Навзвание произведения'
+    )
+    year = models.SmallIntegerField(
+        verbose_name='Год создания произведения'
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Описание'
+    )
+    genre = models.ManyToManyField(
+        Genre,
+        db_index=True,
+        blank=True,
+        verbose_name='Жанр произведения'
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Категория произведения'
+    )
+
+    class Meta:
+        verbose_name = "Произведение"
+        verbose_name_plural = "Произведения"
 
     def __str__(self):
         return self.name
 
-
+      
 class Genre(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название жанра'
+    )
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Адрес жанра'
+    )
+
+    class Meta:
+        verbose_name = "Жанр"
+        verbose_name_plural = "Жанры"
 
     def __str__(self):
         return self.name
-
 
 class GenreTitle(models.Model):
     title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
@@ -47,4 +90,3 @@ class Comment(models.Model):
     text = models.TextField()
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='comments')
     pub_date = models.DateTimeField(auto_now_add=True)
-
