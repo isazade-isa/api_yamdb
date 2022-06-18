@@ -21,6 +21,25 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
+class Genre(models.Model):
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название жанра'
+    )
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Адрес жанра'
+    )
+
+    class Meta:
+        verbose_name = "Жанр"
+        verbose_name_plural = "Жанры"
+
+    def __str__(self):
+        return self.name
+
+
 class Title(models.Model):
     name = models.CharField(
         max_length=256,
@@ -55,24 +74,6 @@ class Title(models.Model):
         return self.name
 
 
-class Genre(models.Model):
-    name = models.CharField(
-        max_length=256,
-        verbose_name='Название жанра'
-    )
-    slug = models.SlugField(
-        unique=True,
-        verbose_name='Адрес жанра'
-    )
-
-    class Meta:
-        verbose_name = "Жанр"
-        verbose_name_plural = "Жанры"
-
-    def __str__(self):
-        return self.name
-
-
 class Review(models.Model):
     text = models.TextField(
         verbose_name='Текст отзыва'
@@ -96,7 +97,7 @@ class Review(models.Model):
         db_index=True
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор отзыва',
@@ -124,7 +125,7 @@ class Review(models.Model):
         return self.text[:10]
 
 
- class Comment(models.Model):
+class Comment(models.Model):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
@@ -134,7 +135,7 @@ class Review(models.Model):
         verbose_name='Отзыв'
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария',
@@ -157,7 +158,7 @@ class Review(models.Model):
     def __str__(self):
         return self.text[:10]
 
-      
+
 class GenreTitle(models.Model):
     title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)
