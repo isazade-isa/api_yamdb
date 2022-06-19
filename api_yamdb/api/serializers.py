@@ -78,17 +78,33 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
-    def validate(self, data):
-        if data.get('username') == 'me':
-            raise serializers.ValidationError(
-                "Don't create user with username 'me'")
-        return data
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    role = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role')
         model = CustomUser
-        extra_kwargs = {'email': {'required': True, 'allow_blank': False}}
+
+
+class SingUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('username', 'email',)
+        model = CustomUser
+
+    # def validate(self, data):
+    #     if data.get('username') == 'me':
+    #         raise serializers.ValidationError(
+    #             )
+    #     return data
+    @staticmethod
+    def validate_username(value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                "Don't create user with username 'me'"
+            )
+        return value
 
 
 class TokenSerializer(serializers.Serializer):
