@@ -30,7 +30,7 @@ class CategoryViewSet(
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = (IsAuthenticatedOrReadOnly)
+    permission_classes = (IsAuthorOrStaffOrReadOnly)
 
 
 class GenreViewSet(
@@ -43,7 +43,7 @@ class GenreViewSet(
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = (IsAuthenticatedOrReadOnly)
+    permission_classes = (IsAuthorOrStaffOrReadOnly)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -51,12 +51,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
-    permission_classes = (IsAuthenticatedOrReadOnly)
+    permission_classes = (IsAuthorOrStaffOrReadOnly)
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAuthorOrStaffOrReadOnly)
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)

@@ -159,6 +159,6 @@ class Comment(models.Model):
         return self.text[:10]
 
 
-class GenreTitle(models.Model):
-    title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)
+# class GenreTitle(models.Model):
+#     title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
+#     genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)
