@@ -22,8 +22,8 @@ router_v1.register(r'titles/(?P<title_id>\d+)/reviews/'
 
 
 urlpatterns = [
-    path('v1/', include(router_v1.urls)),
-    path(r'auth/signup/', ConfirmationCode.as_view()),
+    path('', include(router_v1.urls)),
+    path('auth/signup/', ConfirmationCode.as_view()),
     path(
         'auth/token/',
         Token.as_view(),

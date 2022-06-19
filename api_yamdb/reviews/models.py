@@ -1,7 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import CustomUser
+
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -157,8 +161,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:10]
-
-
-# class GenreTitle(models.Model):
-#     title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
-#     genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)

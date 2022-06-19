@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Genre, Title, Review, Comment, User
 from users.models import CustomUser
 
 from rest_framework.exceptions import ValidationError
@@ -89,6 +89,13 @@ class UserSerializer(serializers.ModelSerializer):
             'username', 'email', 'first_name', 'last_name', 'bio', 'role')
         model = CustomUser
         extra_kwargs = {'email': {'required': True, 'allow_blank': False}}
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'username')
 
 
 class TokenSerializer(serializers.Serializer):
