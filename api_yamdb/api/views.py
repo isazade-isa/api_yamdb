@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import filters, mixins, viewsets, status
 
 from users.models import CustomUser
@@ -17,7 +17,7 @@ from api.serializers import (
     CommentSerializer, ReviewSerializer, TokenSerializer, SingUpSerializer)
 from reviews.models import Category, Genre, Review, Title
 from .filters import TitleFilterSet
-from .permissions import IsAuthorOrStaffOrReadOnly
+from .permissions import IsAuthorOrStaffOrReadOnly, IsUser,IsAdmin, IsModerator, IsOwner
 from django.conf import settings
 
 
@@ -27,11 +27,11 @@ class CategoryViewSet(
         mixins.DestroyModelMixin,
         viewsets.GenericViewSet):
     queryset = Category.objects.all()
+    lookup_field = 'slug'
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    lookup_field = 'slug'
-    permission_classes = (IsAuthorOrStaffOrReadOnly)
+    permission_classes = [IsAuthorOrStaffOrReadOnly,]
 
 
 class GenreViewSet(
@@ -44,7 +44,7 @@ class GenreViewSet(
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = (IsAuthorOrStaffOrReadOnly)
+    permission_classes = [IsAuthorOrStaffOrReadOnly,]
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -52,7 +52,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
-    permission_classes = (IsAuthorOrStaffOrReadOnly)
+    permission_classes = [IsAuthorOrStaffOrReadOnly,]
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -62,23 +62,35 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
+    permission_classes = [IsAdmin | IsAdminUser]
 
-    @action(detail=True,
+    @action(detail=False,
             permission_classes=[IsAuthenticated],
-            methods=['get', 'patch']
+            methods=['get']
             )
     def me(self, request, *args, **kwargs):
         serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+    @me.mapping.patch
+    def update_user(self, request):
+        serializer = self.get_serializer(
+            self.request.user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=self.request.user.role)
         return Response(serializer.data)
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (
+    permission_classes = [
         IsAuthorOrStaffOrReadOnly,
         IsAuthenticatedOrReadOnly
-    )
+    ]
 
     def _get_title(self):
         return get_object_or_404(Title, id=self.kwargs['title_id'])
@@ -96,10 +108,10 @@ class CommentsViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (
+    permission_classes = [
         IsAuthorOrStaffOrReadOnly,
         IsAuthenticatedOrReadOnly
-    )
+    ]
 
     def _get_review(self):
         return get_object_or_404(Review, id=self.kwargs['review_id'])
@@ -157,7 +169,7 @@ class APIGetToken(APIView):
                     'confirmation_code'
                 )
         ):
-            token = RefreshToken.for_user(user)
+            token = AccessToken.for_user(user)
             return Response(
                 {'token': f'{token}'},
                 status=status.HTTP_200_OK
