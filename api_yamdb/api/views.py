@@ -31,7 +31,7 @@ class CategoryViewSet(
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = (IsAuthorOrStaffOrReadOnly)
+    permission_classes = (IsAuthorOrStaffOrReadOnly,)
 
 
 class GenreViewSet(
@@ -44,7 +44,7 @@ class GenreViewSet(
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = (IsAuthorOrStaffOrReadOnly)
+    permission_classes = (IsAuthorOrStaffOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -52,13 +52,12 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
-    permission_classes = (IsAuthorOrStaffOrReadOnly)
+    permission_classes = (IsAuthorOrStaffOrReadOnly,)
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
@@ -75,10 +74,10 @@ class UserViewSet(viewsets.ModelViewSet):
 class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (
+    permission_classes = [
         IsAuthorOrStaffOrReadOnly,
-        IsAuthenticatedOrReadOnly
-    )
+        IsAuthenticatedOrReadOnly,
+    ]
 
     def _get_title(self):
         return get_object_or_404(Title, id=self.kwargs['title_id'])
@@ -96,10 +95,10 @@ class CommentsViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (
+    permission_classes = [
         IsAuthorOrStaffOrReadOnly,
-        IsAuthenticatedOrReadOnly
-    )
+        IsAuthenticatedOrReadOnly,
+    ]
 
     def _get_review(self):
         return get_object_or_404(Review, id=self.kwargs['review_id'])
