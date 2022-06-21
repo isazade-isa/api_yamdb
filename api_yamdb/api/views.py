@@ -7,10 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (
-    IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly,
-    AllowAny
-)
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import filters, mixins, viewsets, status
 
@@ -20,7 +17,7 @@ from api.serializers import (
     CommentSerializer, ReviewSerializer, TokenSerializer, SingUpSerializer)
 from reviews.models import Category, Genre, Review, Title
 from .filters import TitleFilterSet
-from .permissions import IsAuthorOrStaffOrReadOnly, IsUser, IsAdmin, IsModerator, IsOwner, IsAdminOrModerPermission
+from .permissions import IsAuthorOrStaffOrReadOnly, IsUser, IsAdmin, IsModerator, IsOwner
 from django.conf import settings
 
 
@@ -51,7 +48,7 @@ class GenreViewSet(
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
@@ -91,7 +88,8 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [
-        IsAdminOrModerPermission,
+        IsAuthorOrStaffOrReadOnly,
+        IsAuthenticatedOrReadOnly
     ]
 
     def _get_title(self):
@@ -111,7 +109,8 @@ class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [
-        IsAdminOrModerPermission,
+        IsAuthorOrStaffOrReadOnly,
+        IsAuthenticatedOrReadOnly
     ]
 
     def _get_review(self):
