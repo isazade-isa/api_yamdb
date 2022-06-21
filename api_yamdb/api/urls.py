@@ -23,11 +23,7 @@ router_v1.register(r'titles/(?P<title_id>\d+)/reviews/'
 
 urlpatterns = [
     path('', include(router_v1.urls)),
-<<<<<<< HEAD
-    path('auth/signup/', ConfirmationCode.as_view()),
-=======
     path('auth/signup/', APIGetConfirmationCode.as_view()),
->>>>>>> master
     path(
         'auth/token/',
         APIGetToken.as_view(),
