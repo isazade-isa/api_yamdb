@@ -22,21 +22,6 @@ class GenreSerializer(serializers.ModelSerializer):
         exclude = ('id',)
 
 
-# class TitleSerializer(serializers.ModelSerializer):
-#     genre = serializers.SlugRelatedField(
-#         queryset=Genre.objects.all(),
-#         slug_field='slug',
-#         many=True
-#     )
-#     category = serializers.SlugRelatedField(
-#         queryset=Category.objects.all(),
-#         slug_field='slug'
-#     )
-
-#     class Meta:
-#         model = Title
-#         fields = ('id', 'name', 'category', 'genre', 'year', 'description')
-
 
 class TitleReadSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(
