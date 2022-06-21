@@ -3,6 +3,7 @@ from rest_framework import serializers
 from reviews.models import Category, Genre, Title, Review, Comment
 from users.models import CustomUser
 
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
@@ -31,10 +32,12 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         slug_field='slug'
     )
+    rating = serializers.IntegerField(required=False)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'category', 'genre', 'year', 'description')
+        fields = ('id', 'name', 'category', 'genre', 'year', 'description', 'rating')
+        read_only_fields = ("id", "rating")
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -78,9 +81,22 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    role = serializers.StringRelatedField(read_only=True)
+    username = serializers.CharField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=CustomUser.objects.all()
+            )
+        ]
+    )
+    email = serializers.EmailField(
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=CustomUser.objects.all()
+            )
+        ]
+    )
 
     class Meta:
         fields = (
@@ -88,16 +104,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
 
 
+
 class SingUpSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('username', 'email',)
         model = CustomUser
 
-    # def validate(self, data):
-    #     if data.get('username') == 'me':
-    #         raise serializers.ValidationError(
-    #             )
-    #     return data
+
     @staticmethod
     def validate_username(value):
         if value == 'me':
