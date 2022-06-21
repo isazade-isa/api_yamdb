@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Genre, Title, Review, Comment, User
 from users.models import CustomUser
 
 from rest_framework.validators import UniqueValidator
@@ -119,6 +119,13 @@ class SingUpSerializer(serializers.ModelSerializer):
                 "Don't create user with username 'me'"
             )
         return value
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'username')
 
 
 class TokenSerializer(serializers.Serializer):
