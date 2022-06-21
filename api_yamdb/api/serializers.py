@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comment, User
+from reviews.models import Category, Genre, Title, Review, Comment
 from users.models import CustomUser
 
 from rest_framework.validators import UniqueValidator
@@ -22,6 +22,7 @@ class GenreSerializer(serializers.ModelSerializer):
         exclude = ('id',)
 
 
+
 class TitleReadSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(
         source='reviews__score__avg', read_only=True
@@ -30,9 +31,8 @@ class TitleReadSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
 
     class Meta:
-        fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
-        )
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
         model = Title
 
 
@@ -47,11 +47,6 @@ class TitleWriteSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         model = Title
-
-    def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
-            return TitleReadSerializer
-        return TitleWriteSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -135,13 +130,6 @@ class SingUpSerializer(serializers.ModelSerializer):
                 "Don't create user with username 'me'"
             )
         return value
-
-
-class SignUpSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('email', 'username')
 
 
 class TokenSerializer(serializers.Serializer):
