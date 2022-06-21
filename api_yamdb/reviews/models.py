@@ -84,7 +84,7 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         verbose_name='Оценка',
-        validators=(
+        validators=[
             MinValueValidator(
                 1,
                 message='Оценка должна быть в диапазоне от 1 до 10'
@@ -93,7 +93,7 @@ class Review(models.Model):
                 10,
                 message='Оценка должна быть в диапазоне от 1 до 10'
             )
-        )
+        ]
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации отзыва',
