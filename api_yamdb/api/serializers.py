@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Genre, Title, Review, Comment, User
 from users.models import CustomUser
 
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
@@ -45,10 +45,11 @@ class CommentSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True
     )
+    review = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date', 'review')
         read_only_fields = ('review', 'author')
 
 
@@ -57,9 +58,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True
     )
+    title = serializers.SlugRelatedField(
+        slug_field='id',
+        queryset=Title.objects.all(),
+        required=False
+    )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date', 'title')
         read_only_fields = ('author', 'title')
         model = Review
 
@@ -80,7 +86,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     username = serializers.CharField(
         required=True,
         validators=[
@@ -110,7 +115,6 @@ class SingUpSerializer(serializers.ModelSerializer):
         fields = ('username', 'email',)
         model = CustomUser
 
-
     @staticmethod
     def validate_username(value):
         if value == 'me':
@@ -118,6 +122,13 @@ class SingUpSerializer(serializers.ModelSerializer):
                 "Don't create user with username 'me'"
             )
         return value
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'username')
 
 
 class TokenSerializer(serializers.Serializer):

@@ -7,7 +7,10 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly,
+    AllowAny
+)
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import filters, mixins, viewsets, status
 
@@ -31,7 +34,8 @@ class CategoryViewSet(
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = [IsAuthorOrStaffOrReadOnly,]
+    permission_classes = [IsAuthorOrStaffOrReadOnly, ]
+
 
 
 class GenreViewSet(
@@ -44,21 +48,23 @@ class GenreViewSet(
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    permission_classes = [IsAuthorOrStaffOrReadOnly,]
+    permission_classes = [IsAuthorOrStaffOrReadOnly, ]
+
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
-    permission_classes = [IsAuthorOrStaffOrReadOnly,]
+    pagination_class = LimitOffsetPagination
+    permission_classes = [IsAuthorOrStaffOrReadOnly, ]
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
@@ -90,10 +96,11 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsTest,
         IsAuthenticatedOrReadOnly
+
     ]
 
     def _get_title(self):
-        return get_object_or_404(Title, id=self.kwargs['title_id'])
+        return get_object_or_404(Title, id=self.kwargs.get('title_id'))
 
     def perform_create(self, serializer):
         title = self._get_title()
@@ -114,7 +121,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
     ]
 
     def _get_review(self):
-        return get_object_or_404(Review, id=self.kwargs['review_id'])
+        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
 
     def perform_create(self, serializer):
         review = self._get_review()

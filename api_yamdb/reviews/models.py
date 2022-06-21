@@ -1,7 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import CustomUser
+
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -80,7 +84,7 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         verbose_name='Оценка',
-        validators=(
+        validators=[
             MinValueValidator(
                 1,
                 message='Оценка должна быть в диапазоне от 1 до 10'
@@ -89,7 +93,7 @@ class Review(models.Model):
                 10,
                 message='Оценка должна быть в диапазоне от 1 до 10'
             )
-        )
+        ]
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации отзыва',
@@ -158,7 +162,3 @@ class Comment(models.Model):
     def __str__(self):
         return self.text[:10]
 
-
-# class GenreTitle(models.Model):
-#     title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
-#     genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)
