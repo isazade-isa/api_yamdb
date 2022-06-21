@@ -20,7 +20,7 @@ from api.serializers import (
     CommentSerializer, ReviewSerializer, TokenSerializer, SingUpSerializer)
 from reviews.models import Category, Genre, Review, Title
 from .filters import TitleFilterSet
-from .permissions import IsAuthorOrStaffOrReadOnly, IsUser, IsAdmin, IsModerator, IsOwner, IsAdminOrModerPermission
+from .permissions import IsAuthorOrStaffOrReadOnly, IsUser, IsAdmin, IsModerator, IsOwner, IsTest
 from django.conf import settings
 
 
@@ -37,6 +37,7 @@ class CategoryViewSet(
     permission_classes = [IsAuthorOrStaffOrReadOnly, ]
 
 
+
 class GenreViewSet(
         mixins.CreateModelMixin,
         mixins.ListModelMixin,
@@ -50,6 +51,7 @@ class GenreViewSet(
     permission_classes = [IsAuthorOrStaffOrReadOnly, ]
 
 
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
@@ -57,6 +59,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilterSet
     pagination_class = LimitOffsetPagination
     permission_classes = [IsAuthorOrStaffOrReadOnly, ]
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -91,7 +94,9 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [
-        IsAdminOrModerPermission,
+        IsTest,
+        IsAuthenticatedOrReadOnly
+
     ]
 
     def _get_title(self):
@@ -111,7 +116,8 @@ class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [
-        IsAdminOrModerPermission,
+        IsTest,
+        IsAuthenticatedOrReadOnly
     ]
 
     def _get_review(self):

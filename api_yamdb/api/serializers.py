@@ -3,7 +3,7 @@ from rest_framework import serializers
 from reviews.models import Category, Genre, Title, Review, Comment, User
 from users.models import CustomUser
 
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
@@ -32,10 +32,12 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         slug_field='slug'
     )
+    rating = serializers.IntegerField(required=False)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'category', 'genre', 'year', 'description')
+        fields = ('id', 'name', 'category', 'genre', 'year', 'description', 'rating')
+        read_only_fields = ("id", "rating")
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -105,6 +107,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role')
         model = CustomUser
+
 
 
 class SingUpSerializer(serializers.ModelSerializer):
