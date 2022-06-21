@@ -17,7 +17,7 @@ from api.serializers import (
     CommentSerializer, ReviewSerializer, TokenSerializer, SingUpSerializer)
 from reviews.models import Category, Genre, Review, Title
 from .filters import TitleFilterSet
-from .permissions import IsAuthorOrStaffOrReadOnly, IsUser, IsAdmin, IsModerator, IsOwner, IsTest
+from .permissions import IsAuthorOrStaffOrReadOnly, IsAdmin, IsTest
 from django.conf import settings
 
 
