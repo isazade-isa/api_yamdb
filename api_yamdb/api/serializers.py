@@ -1,11 +1,11 @@
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
-from reviews.models import Category, Genre, Title, Review, Comment
-from users.models import CustomUser
-
 from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
+
+from reviews.models import Category, Genre, Review, Title, Comment
+from users.models import CustomUser
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -22,18 +22,23 @@ class GenreSerializer(serializers.ModelSerializer):
         exclude = ('id',)
 
 
-
 class TitleReadSerializer(serializers.ModelSerializer):
-    rating = serializers.IntegerField(
-        source='reviews__score__avg', read_only=True
-    )
+    rating = serializers.SerializerMethodField()
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genre', 'category')
+        fields = (
+            'id', 'name', 'year', 'rating',
+            'description', 'genre', 'category'
+        )
         model = Title
+
+    def get_rating(self, obj):
+        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
+        if not rating:
+            return rating
+        return round(rating, 1)
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
