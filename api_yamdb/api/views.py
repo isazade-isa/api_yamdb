@@ -17,7 +17,9 @@ from rest_framework import filters, viewsets, status
 from users.models import CustomUser
 from reviews.models import Category, Genre, Review, Title
 from reviews.filters import TitleFilterSet
-from api.permissions import IsAuthorOrStaffOrReadOnly, IsAdmin, IsAuthorAdminOrModeratorPermission
+from api.permissions import (
+    IsAuthorOrStaffOrReadOnly, IsAdmin, IsAuthorAdminOrModeratorPermission
+)
 from api.mixins import MixViewSet
 from api.serializers import (
     CategorySerializer, GenreSerializer, TitleReadSerializer,
@@ -27,6 +29,9 @@ from api.serializers import (
 
 
 class CategoryViewSet(MixViewSet):
+    """
+    Категории (типы) произведений.
+    """
     queryset = Category.objects.all()
     lookup_field = 'slug'
     serializer_class = CategorySerializer
@@ -36,6 +41,9 @@ class CategoryViewSet(MixViewSet):
 
 
 class GenreViewSet(MixViewSet):
+    """
+    Категории жанров.
+    """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
@@ -45,6 +53,10 @@ class GenreViewSet(MixViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """
+    Произведения, к которым пишут отзывы 
+    (определённый фильм, книга или песенка).
+    """
     queryset = Title.objects.annotate(Avg('reviews__score')).all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
@@ -57,6 +69,21 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """
+    Ресурсы API YaMDb
+    Ресурс auth: аутентификация.
+    Ресурс users: пользователи.
+    Ресурс titles: произведения, к которым пишут отзывы 
+        (определённый фильм, книга или песенка).
+    Ресурс categories: категории (типы) произведений 
+        («Фильмы», «Книги», «Музыка»).
+    Ресурс genres: жанры произведений. Одно произведение может 
+        быть привязано к нескольким жанрам.
+    Ресурс reviews: отзывы на произведения. 
+        Отзыв привязан к определённому произведению.
+    Ресурс comments: комментарии к отзывам. 
+        Комментарий привязан к определённому отзыву.
+    """
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     pagination_class = LimitOffsetPagination
@@ -86,6 +113,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
+
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [
@@ -106,6 +134,9 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
+    """
+    отзывы на произведения. Отзыв привязан к определённому произведению.
+    """
     queryset = Review.objects.all()
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
@@ -127,6 +158,12 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
 
 class APIGetConfirmationCode(APIView):
+    """
+    Регистрация нового пользователя
+    Получить код подтверждения на переданный email
+    Использовать имя 'me' в качестве username запрещено.
+    """
+
     def post(self, request):
         serializer = SingUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -155,6 +192,10 @@ class APIGetConfirmationCode(APIView):
 
 
 class APIGetToken(APIView):
+    """
+    Получение JWT-токена в обмен на username и confirmation code.
+    """
+
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
         if not serializer.is_valid():
