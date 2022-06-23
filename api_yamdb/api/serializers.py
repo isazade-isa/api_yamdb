@@ -23,7 +23,9 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(
+        source='reviews__score__avg', read_only=True
+    )
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
 
@@ -33,12 +35,6 @@ class TitleReadSerializer(serializers.ModelSerializer):
             'description', 'genre', 'category'
         )
         model = Title
-
-    def get_rating(self, obj):
-        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
-        if not rating:
-            return rating
-        return round(rating, 1)
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
@@ -64,7 +60,6 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date', 'review')
-        read_only_fields = ('review', 'author')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -80,7 +75,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date', 'title')
-        read_only_fields = ('author', 'title')
         model = Review
 
     def validate(self, data):
@@ -137,6 +131,9 @@ class SingUpSerializer(serializers.ModelSerializer):
         return value
 
 
-class TokenSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
+class TokenSerializer(serializers.ModelSerializer):
     confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'confirmation_code')

@@ -1,11 +1,8 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.conf import settings
 
 from users.models import CustomUser
-
-
-User = get_user_model()
 
 
 class Category(models.Model):
@@ -49,7 +46,7 @@ class Title(models.Model):
         max_length=256,
         verbose_name='Навзвание произведения'
     )
-    year = models.SmallIntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name='Год создания произведения'
     )
     description = models.TextField(
@@ -82,7 +79,7 @@ class Review(models.Model):
     text = models.TextField(
         verbose_name='Текст отзыва'
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
         validators=[
             MinValueValidator(
@@ -115,7 +112,7 @@ class Review(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ['-pub_date', ]
         constraints = [
             models.UniqueConstraint(
                 fields=('author', 'title'),
@@ -126,7 +123,7 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
 
     def __str__(self):
-        return self.text[:10]
+        return self.text[:settings.CONST]
 
 
 class Comment(models.Model):
@@ -155,9 +152,9 @@ class Comment(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ['-pub_date', ]
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text[:10]
+        return self.text[:settings.CONST]

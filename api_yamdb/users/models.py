@@ -11,11 +11,19 @@ class CustomUser(AbstractUser):
         (MODERATOR, 'Moderator'),
         (ADMIN, 'Admin'),
     )
-    email = models.EmailField('email address', unique=True)
+    email = models.EmailField(
+        verbose_name='E-mail',
+        unique=True,
+    )
     bio = models.TextField(
+        verbose_name='Биография',
         blank=True,
     )
-    role = models.CharField(max_length=50, choices=ROLES, default=USER)
+    role = models.CharField(
+        verbose_name='Роли',
+        max_length=50,
+        choices=ROLES,
+        default=USER)
 
     def __str__(self):
         return self.username
