@@ -27,12 +27,16 @@ router_v1.register(
 )
 
 
-urlpatterns = [
-    path('v1/', include(router_v1.urls)),
-    path('v1/auth/signup/', APIGetConfirmationCode.as_view()),
+auth = [
+    path('signup/', APIGetConfirmationCode.as_view()),
     path(
-        'v1/auth/token/',
+        'token/',
         APIGetToken.as_view(),
         name='token_obtain_pair'
     ),
+]
+
+urlpatterns = [
+    path('v1/', include(router_v1.urls)),
+    path('v1/auth/', include(auth)),
 ]

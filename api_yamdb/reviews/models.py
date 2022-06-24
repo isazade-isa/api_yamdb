@@ -3,6 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.conf import settings
 
 from users.models import CustomUser
+from reviews.validators import year_is_valid
 
 
 class Category(models.Model):
@@ -47,11 +48,11 @@ class Title(models.Model):
         verbose_name='Навзвание произведения'
     )
     year = models.PositiveSmallIntegerField(
+        validators=[year_is_valid],
         verbose_name='Год создания произведения'
     )
     description = models.TextField(
         blank=True,
-        null=True,
         verbose_name='Описание'
     )
     genre = models.ManyToManyField(
@@ -112,7 +113,7 @@ class Review(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date', ]
+        ordering = ('-pub_date',)
         constraints = [
             models.UniqueConstraint(
                 fields=('author', 'title'),
@@ -152,7 +153,7 @@ class Comment(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date', ]
+        ordering = ('-pub_date',)
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 
