@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from reviews.models import Category, Genre, Title, Review, Comment
-from users.models import CustomUser
 
 
 class CategoryGenreAdmin(admin.ModelAdmin):
@@ -22,20 +21,6 @@ class TitleAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('category',)
-    empty_value_display = '-пусто-'
-
-
-class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        'username',
-        'first_name',
-        'last_name',
-        'email',
-        'role'
-    )
-    list_editable = ('role',)
-    list_filter = ('role',)
-    search_fields = ('username',)
     empty_value_display = '-пусто-'
 
 
@@ -67,6 +52,5 @@ class CommentAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryGenreAdmin)
 admin.site.register(Genre, CategoryGenreAdmin)
 admin.site.register(Title, TitleAdmin)
-admin.site.register(CustomUser, UserAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Comment, CommentAdmin)
